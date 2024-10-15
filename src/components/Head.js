@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { toggleMenu } from '../utils/appSlice';
 import { YOUTUBE_SEARCH_API,YOUTUBE_SEARCH_API_exte } from '../utils/constants';
+import { CacheSearch } from '../utils/searchSlice';
 const Head = () => {
   const dispatch=useDispatch();
   const [searchInput,setSearchInput]=useState("");
-  console.log(searchInput);
   const [searchValues,setSearchValues]=useState([]);
+  const [searchSuggestions,setSearchSuggestions]=useState(false);
+  const searchCache=useSelector((store)=>store.Search);
   useEffect(
-    ()=>{
-      const timer=setTimeout(()=>SearchHandler(),200);
+    ()=>{// Debouncing
+      const timer=setTimeout(()=>{
+        if(searchCache[searchInput]){// fetching from cache
+          setSearchSuggestions(searchCache[searchInput]);
+        }
+        else{
+        SearchHandler();
+        }
+      }
+        ,200);
      // until another key event happens(another search key) return wont get called 
      // so if the time diff is >200ms btw 2 key events searchHandler will get called otherwise it clears timeout and again useeffect will starts
       return ()=>{
@@ -17,9 +27,14 @@ const Head = () => {
       }
     },[searchInput]);
   const SearchHandler=async ()=>{
+    // If we are not getting data go to this url and get key and paste new key in constants https://console.cloud.google.com/apis/credentials?pli=1&project=snappy-cosine-437711-k8
    const data=await fetch(YOUTUBE_SEARCH_API+searchInput+YOUTUBE_SEARCH_API_exte);
    const json=await data.json();
    setSearchValues(json.items);
+   // updating cache
+   dispatch(CacheSearch({
+    [searchInput]:json.items,
+   }))
    console.log(json.items);
   }
   const toggleMenuHandler=()=>{
@@ -35,15 +50,17 @@ const Head = () => {
     <div className='mt-8  col-span-10'>
       <div>
       <input type="text" value={searchInput} 
+      onFocus={()=>setSearchSuggestions(true)}
+      onBlur={()=>setSearchSuggestions(false)}
       onChange={(e)=>setSearchInput(e.target.value)}
-      className='border p-1 pl-2 ml-1 border-gray-400 mt-1 mb-1 w-2/4 ml-16 rounded-l-full' aria-label="search"></input>
+      className='border p-1 pl-3 ml-1 border-gray-400 mt-1 mb-1 w-2/4 ml-16 rounded-l-full' aria-label="search"></input>
       <button className='pb-2 px-2 rounded-r-full bg-gray-100'>
         <img alt="" className='h-6 w-6 pt-2 rounded-full' src="https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg"></img>
       </button>
       </div>
-      {searchInput===""?"":<div>
-        <ul className='fixed bg-white pl-2 ml-2 w-[29rem] shadow-lg rounded-lg'>
-          { searchValues.map(value=> {return <li className=' py-1 hover:bg-gray-300'>{value.snippet.title}</li>})}
+      {searchInput===""?"":searchSuggestions && <div className=' flex flex-col'>
+        <ul className='fixed bg-white pl-2 ml-1 flex-1 border-gray-400  mb-1 w-[38%] ml-16 shadow-lg rounded-lg'>
+          { searchValues.map(value=> {return <li key={value.id.videoId} className=' py-1 hover:bg-gray-300'>{value.snippet.title}</li>})}
         </ul>
       </div>}
     </div>
