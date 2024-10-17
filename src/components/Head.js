@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleMenu } from '../utils/appSlice';
-import { YOUTUBE_SEARCH_API,YOUTUBE_SEARCH_API_exte } from '../utils/constants';
-import { CacheSearch } from '../utils/searchSlice';
+import { YOUTUBE_SEARCH_API,YOUTUBE_SEARCH_API_exte,YOUTUBE_ONSEARCHCLICK_VIDEOS } from '../utils/constants';
+import { CacheSearch,searchClick } from '../utils/searchSlice';
 const Head = () => {
   const dispatch=useDispatch();
   const [searchInput,setSearchInput]=useState("");
@@ -26,6 +26,13 @@ const Head = () => {
         clearInterval(timer);// behaves like unmounting
       }
     },[searchInput]);
+    const OnsearchVideos=async (value)=>{
+      const data=await fetch(YOUTUBE_ONSEARCHCLICK_VIDEOS+value+YOUTUBE_SEARCH_API_exte);
+      console.log(YOUTUBE_ONSEARCHCLICK_VIDEOS+value+YOUTUBE_SEARCH_API_exte);
+      const json=await data.json();
+      dispatch(searchClick(json.items
+      ))
+    }
   const SearchHandler=async ()=>{
     // If we are not getting data go to this url and get key and paste new key in constants https://console.cloud.google.com/apis/credentials?pli=1&project=snappy-cosine-437711-k8
    const data=await fetch(YOUTUBE_SEARCH_API+searchInput+YOUTUBE_SEARCH_API_exte);
@@ -33,7 +40,7 @@ const Head = () => {
    setSearchValues(json.items);
    // updating cache
    dispatch(CacheSearch({
-    [searchInput]:json.items,
+    [searchInput]:json.items,// to store as key value pair
    }))
    console.log(json.items);
   }
@@ -51,7 +58,7 @@ const Head = () => {
       <div>
       <input type="text" value={searchInput} 
       onFocus={()=>setSearchSuggestions(true)}
-      onBlur={()=>setSearchSuggestions(false)}
+     // onBlur={()=>setSearchSuggestions(false)}
       onChange={(e)=>setSearchInput(e.target.value)}
       className='border p-1 pl-3 ml-1 border-gray-400 mt-1 mb-1 w-2/4 ml-16 rounded-l-full' aria-label="search"></input>
       <button className='pb-2 px-2 rounded-r-full bg-gray-100'>
@@ -60,7 +67,7 @@ const Head = () => {
       </div>
       {searchInput===""?"":searchSuggestions && <div className=' flex flex-col'>
         <ul className='fixed bg-white pl-2 ml-1 flex-1 border-gray-400  mb-1 w-[38%] ml-16 shadow-lg rounded-lg'>
-          { searchValues.map(value=> {return <li key={value.id.videoId} className=' py-1 hover:bg-gray-300'>{value.snippet.title}</li>})}
+          { searchValues.map(value=> {return <li key={value.id.videoId} onClick={()=>OnsearchVideos(value.id.videoId)} className=' py-1 hover:bg-gray-300'>{value.snippet.title}</li>})}
         </ul>
       </div>}
     </div>
