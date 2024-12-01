@@ -67,7 +67,7 @@ const Head = () => {
       onChange={(e)=>setSearchInput(e.target.value)}
       className='border p-1 pl-3 ml-1 w-1/2 border-gray-400 mt-1 mb-1  ml-16 rounded-l-full' aria-label="search"></input>
       <button className='pl-1 border  border-gray-400 mt-1 mb-1  rounded-r-full bg-gray-100'>
-        <img alt="" className='h-[25px] p-0.5 pr-1 rounded-r-full' src="https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg"></img>
+        <img alt="" className='h-[22px] p-0.5 pr-1 rounded-r-full' src="https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg"></img>
       </button>
       </div>
       
