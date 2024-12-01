@@ -37,7 +37,7 @@ const CommentsContainer = () => {
    },[]);
     
   return (
-    <div className='w-[70%] p-5'>
+    <div className='w-[70%] p-5 max-[1100px]:w-[100%]'>
       <h2 className='font-bold px-4'>Comments: </h2>
      <AllComments Allcommentsdata={commentsData}/>
     </div>
