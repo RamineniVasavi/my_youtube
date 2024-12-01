@@ -16,12 +16,13 @@ const LiveChat = () => {
             messages:generateRandomMsg(20),
         })
       );
-      setLiveMessage("");
-    },2000);
+      //setLiveMessage("");
+    },1000);
     return ()=>clearInterval(i);
     },[])
   return (
     <>
+        <h1 className='-mb-5 font-bold text-xl grid justify-center'>Live Chat</h1>
     <div className='flex flex-col-reverse h-80 overflow-y-scroll'>
      {chatMessages.map(i=>
          <ChatMessage name={i.name} message={i.messages}/>
@@ -33,14 +34,15 @@ const LiveChat = () => {
       dispatch(addMessages({
         name:"Anu",
         messages:Livemessage,
-      }))
+      }));
+      setLiveMessage("");
      }}>
        <input value={Livemessage}
        onChange={(e)=>
         setLiveMessage(e.target.value)
        }
-        className='border border-black mx-1'></input>
-       <button type="submit" className='bg-green-200 mx-3'>Send</button>
+        className='border border-black rounded-sm mx-1 p-1' placeholder='Type a message'></input>
+       <button type="submit" className='bg-sky-300 mx-1 rounded-sm py-1 px-3'>Send</button>
      </form>
      </>
   )

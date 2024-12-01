@@ -25,10 +25,10 @@ const appRouter= createBrowserRouter([
 ]);
 function App() {
   return (
-    <Provider store={store}>
+    <Provider store={store}>{/*To provide Redux store*/}
    <div >
     <Head />
-    <RouterProvider router={appRouter}/>
+    <RouterProvider router={appRouter}/> {/*To provide routing*/}
    </div>
    </Provider>
   );

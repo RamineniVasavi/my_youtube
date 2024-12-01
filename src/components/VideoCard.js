@@ -4,8 +4,7 @@ const VideoCard = ( { info }) => {
   const { snippet, statistics }=info;
  const { channelTitle,thumbnails,title}=snippet; // inside snippet we have these properties
   return (
-    <div className='p-2 m-2 w-60 shadow-lg'>
-      {/* {console.log({info})} */}
+    <div className='p-2 m-2 w-60 max-[500px]:w-40 h-max shadow-lg'>
       <img className='rounded-lg' src={thumbnails.medium.url} alt="thumbnails"/>
       <ul>
         <li className='font-bold py-2'>{title}</li>

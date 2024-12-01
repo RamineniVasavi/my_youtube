@@ -1,53 +1,45 @@
-import React from 'react'
-const commentsData=[{
-    name:"Vasavi",
-    text: "This is vasavi's comment",
-    replies:[],
-},
-{
-    name:"Vasavi",
-    text: "This is vasavi's 2nd comment",
-    replies:[{
-        name:"Vasavi",
-        text: "This is vasavi's comment",
-        replies:[{
-            name:"Vasavi",
-            text: "This is vasavi's comment",
-            replies:[],
-        },
-        {
-            name:"Vasavi",
-            text: "This is vasavi's comment",
-            replies:[{
-                name:"Vasavi",
-                text: "This is vasavi's comment",
-                replies:[],
-            },],
-        }]
-    },]
-},
-];
+import React, { useEffect, useState } from 'react'
+import { COMMENTSDATA,MY_GOOGLE_API_KEY,USERICON } from '../utils/constants'
+import { useSearchParams } from 'react-router-dom';
+
 const Comment=({ data })=>{
-    const { name , text, replies }=data;
-    return (<div className='p-4 flex shadow-md bg-gray-100'>
-        <img  className="h-7" alt="user" src="https://static.vecteezy.com/system/resources/previews/021/548/095/original/default-profile-picture-avatar-user-avatar-icon-person-icon-head-icon-profile-picture-icons-default-anonymous-user-male-and-female-businessman-photo-placeholder-social-network-avatar-portrait-free-vector.jpg"/>
-         <div className='px-2'>
-         <div>{name}</div>
-         <div>{text}</div>
-         {replies.map((reply)=><Comment data={reply}/>)}
+   let { authorDisplayName,authorProfileImageUrl,textDisplay }=data?.snippet;
+
+   if(data?.snippet?.topLevelComment){
+    authorDisplayName=data?.snippet?.topLevelComment.snippet.authorDisplayName;
+    authorProfileImageUrl=data?.snippet?.topLevelComment.snippet.authorProfileImageUrl;
+    textDisplay=data?.snippet?.topLevelComment.snippet.textDisplay;
+
+   }
+    return (<div className='p-4 flex bg-gray-100'>
+        <img  className="h-7" alt="user" src={authorProfileImageUrl?authorProfileImageUrl:USERICON}/>
+         <div className='px-2 w-[76%]'>
+         <div>{authorDisplayName}</div>
+         <div className='break-words'>{textDisplay}</div>
+         {data?.replies?.comments.map((reply)=><Comment data={reply} />)}
          </div>
     </div>)
 };
-const AllComments =({Allcommentsdata})=>{
-    return Allcommentsdata.map((comment)=> <Comment data={comment}/>)
+const AllComments =({ Allcommentsdata })=>{
+    return Allcommentsdata?.map((comment)=> <Comment data={comment} />)
     
 }
 const CommentsContainer = () => {
+   const [commentsData,setCommentsData]=useState([]);
+   const [ paramdata ]=useSearchParams();
+   const FetchComments=async()=>{
+   const data=await fetch(COMMENTSDATA+paramdata.get("v")+"&key="+MY_GOOGLE_API_KEY);
+   const json=await data.json();
+   setCommentsData(json.items);
+   }
+   useEffect(()=>{
+    FetchComments();
+   },[]);
+    
   return (
-    <div className='w'>
+    <div className='w-[70%] p-5'>
       <h2 className='font-bold px-4'>Comments: </h2>
      <AllComments Allcommentsdata={commentsData}/>
-      {console.log({commentsData})}
     </div>
   )
 }
